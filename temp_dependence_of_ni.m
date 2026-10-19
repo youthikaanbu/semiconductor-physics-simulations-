@@ -1,5 +1,5 @@
-%% Temperature dependence of extrinisic carrier concentration in n-type silicon
-% Im applying cold to hot to the semiconductor silicon to see how the carrier concentration is affected
+%% Temperature dependence of carrier concentration in n-type silicon
+% Sweeps temperature from cold to hot and shows three linked views:
 %   top left  : band diagram (donor level, electrons, holes, thermal generation)
 %   top right : the material itself (what is actually free to move)
 %   bottom    : n0 vs 1000/T curve with a marker at the current temperature
@@ -8,13 +8,17 @@
 clear; clc; close all
 rng(2)
 
-%% Physical parameters (silicon doped with (P) phosphorus-like donors)
+%% Physical parameters (silicon doped with phosphorus-like donors)
 kB    = 8.617e-5;     % Boltzmann constant (eV/K)
-Eg    = 1.12;         % band gap of silicon (eV)
+Eg    = 1.12;         % band gap (eV)
 dE    = 0.05;         % donor binding energy Ec - Ed (eV)
 Nd    = 1e15;         % donor concentration (cm^-3)
 Nc300 = 2.8e19;       % conduction-band effective DOS at 300 K (cm^-3)
 Nv300 = 1.04e19;      % valence-band effective DOS at 300 K (cm^-3)
+
+%% Animation speed (edit these)
+pauseTime   = 0.10;   % seconds per frame: bigger = slower (400 frames, so 0.10 -> about 40 s)
+jitterScale = 0.4;    % how fast the carriers wiggle: smaller = calmer
 
 %% Solve charge neutrality at every temperature
 nF   = 400;                                  % number of animation frames
@@ -138,7 +142,7 @@ for i = 1:nF
     ion = ord(1:kIon);  neu = ord(kIon+1:end);
 
     % thermal jitter of mobile carriers (faster when hotter)
-    s  = 0.01 + 0.03*sqrt(T/300);
+    s  = jitterScale*(0.01 + 0.03*sqrt(T/300));
     xE = refl(xE + s*randn(maxE,1));      yE = refl(yE + s*randn(maxE,1));
     xH = refl(xH + 0.5*s*randn(maxE,1));  yH = refl(yH + 0.5*s*randn(maxE,1));
 
@@ -197,7 +201,7 @@ for i = 1:nF
         n, p, 100*Ndp(i)/Nd, scale);
 
     drawnow
-    pause(0.02)
+    pause(pauseTime)
     % writeVideo(vw, getframe(fig))
 end
 % close(vw)
